@@ -16,13 +16,17 @@ export interface ContentMetrics {
 }
 
 // Constants - user specified
-const LINES_PER_PAGE = 44;
+const LINES_PER_PAGE = 45;
 const HEADER_LINES = 5; // Name, contact, title
 
 // Per-item metadata lines (not including bullets)
-const EXPERIENCE_METADATA_LINES = 3; // Position, Company/Location, Date
-const PROJECT_METADATA_LINES = 3;     // Name, Position/Role, Date
-const LINES_PER_SKILL_CATEGORY = 2;   // Category name + items
+const EXPERIENCE_METADATA_LINES = 2; // Position, company + location, date
+const PROJECT_METADATA_LINES = 1;     // Name + date
+const LINES_PER_SKILL_CATEGORY = 1;   // Base: category name + items (1 line)
+
+// Character thresholds for line wrapping
+const SKILL_LINE_CHAR_THRESHOLD = 115;
+const BULLET_CHAR_THRESHOLD = 130;
 
 /**
  * Estimate page count by dynamically counting actual bullet points
@@ -46,13 +50,16 @@ export function estimatePageCount(resumeData: ResumeData): ContentMetrics {
     experienceLines += 1; // Section header "EXPERIENCE"
 
     for (const exp of resumeData.experiences) {
-      // Metadata: position, company/location, date
+      // Metadata: position, company + location, date (2 lines)
       experienceLines += EXPERIENCE_METADATA_LINES;
 
-      // Bullet points (dynamic count)
-      const bulletCount = exp.description?.length || 0;
-      experienceLines += bulletCount;
-      totalBulletPoints += bulletCount;
+      // Bullet points with character-aware counting
+      for (const bullet of exp.description || []) {
+        // Check if bullet text is long enough to wrap to 2 lines
+        const bulletLines = bullet.length > BULLET_CHAR_THRESHOLD ? 2 : 1;
+        experienceLines += bulletLines;
+        totalBulletPoints++;
+      }
     }
   }
   totalLines += experienceLines;
@@ -63,13 +70,16 @@ export function estimatePageCount(resumeData: ResumeData): ContentMetrics {
     projectLines += 1; // Section header "PROJECTS"
 
     for (const proj of resumeData.projects) {
-      // Metadata: name, position/role, date
+      // Metadata: name + date (1 line)
       projectLines += PROJECT_METADATA_LINES;
 
-      // Bullet points (dynamic count)
-      const bulletCount = proj.description?.length || 0;
-      projectLines += bulletCount;
-      totalBulletPoints += bulletCount;
+      // Bullet points with character-aware counting
+      for (const bullet of proj.description || []) {
+        // Check if bullet text is long enough to wrap to 2 lines
+        const bulletLines = bullet.length > BULLET_CHAR_THRESHOLD ? 2 : 1;
+        projectLines += bulletLines;
+        totalBulletPoints++;
+      }
     }
   }
   totalLines += projectLines;
@@ -78,7 +88,16 @@ export function estimatePageCount(resumeData: ResumeData): ContentMetrics {
   let skillLines = 0;
   if (skillCategoryCount > 0) {
     skillLines += 1; // Section header "SKILLS"
-    skillLines += skillCategoryCount * LINES_PER_SKILL_CATEGORY;
+
+    for (const skill of resumeData.skills) {
+      // Calculate full skill line length: "Category: item1 | item2 | item3"
+      const skillItems = Array.isArray(skill.items) ? skill.items : [skill.items];
+      const fullSkillLine = `${skill.category}: ${skillItems.join(' | ')}`;
+
+      // Check if skill line is long enough to wrap to 2 lines
+      const lines = fullSkillLine.length > SKILL_LINE_CHAR_THRESHOLD ? 2 : 1;
+      skillLines += lines;
+    }
   }
   totalLines += skillLines;
 

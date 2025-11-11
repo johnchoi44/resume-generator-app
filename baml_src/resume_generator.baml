@@ -29,16 +29,26 @@ class ResumeData {
 }
 
 // Scored classes for correlation-based optimization
+class ScoredDescription {
+  text string @description("The bullet point text")
+  relevance_score float @description("0.0-1.0 relevance score for this specific bullet point")
+}
+
 class ScoredExperience {
-  experience Experience @description("The work experience")
-  relevance_score float @description("0.0-1.0 correlation score with target role/requirements")
-  reasoning string @description("Brief explanation of why this experience is relevant")
+  position string @description("Job title")
+  company string @description("Company name")
+  location string @description("Work location")
+  date_from string @description("Start date")
+  date_to string @description("End date or 'Present'")
+  scored_descriptions ScoredDescription[] @description("Array of scored bullet points")
 }
 
 class ScoredProject {
-  project Project @description("The project")
-  relevance_score float @description("0.0-1.0 correlation score with target role/requirements")
-  reasoning string @description("Brief explanation of why this project is relevant")
+  name string @description("Project title")
+  position string @description("Optional role in project")
+  date_from string @description("Project start date")
+  date_to string @description("Project end date")
+  scored_descriptions ScoredDescription[] @description("Array of scored bullet points")
 }
 
 class ScoredSkill {
@@ -154,34 +164,41 @@ function GenerateScoredResume(
 
   prompt #"
     {{ _.role('system') }}
-    You are an expert resume writer and career analyst. Your task is to score ALL potentially
-    relevant experiences, projects, and skill categories based on their correlation with the
-    target job requirements.
-
-    ## Scoring Guidelines
-    - Score each item from 0.0 to 1.0 based on relevance to the target role
-    - 1.0 = Perfectly aligned with requirements
-    - 0.7-0.9 = Highly relevant
-    - 0.4-0.6 = Moderately relevant
-    - 0.1-0.3 = Minimally relevant
-    - 0.0 = Not relevant
+    You are an expert resume writer and career analyst. Your task is to create a tailored resume
+    by selecting and emphasizing the most relevant experiences, then scoring each selected item
+    for 1-page optimization.
 
     ## Instructions
-    1. **Score ALL Items**: Return ALL potentially relevant items with scores (not just top ones)
-    2. **Be Comprehensive**: Include any experience/project/skill that has even minimal relevance
-    3. **Provide Reasoning**: Give brief explanation for each score
-    4. **Consider Match Factors**:
-       - Direct technology/tool matches
-       - Industry domain alignment
-       - Role/responsibility similarities
-       - Required skills coverage
-       - Project type relevance
+    1. **Select Relevant Experiences**: Choose 2-4 most relevant work experiences that match the target role/keywords
+    2. **Prioritize Recent & Relevant**: Favor recent positions unless older ones are more relevant
+    3. **Highlight Matching Skills**: Emphasize skill categories that align with requirements
+    4. **Choose Relevant Projects**: Select 2-3 projects that demonstrate required competencies
+    5. **Customize Bullet Points**: Rewrite or emphasize bullets that match keywords, but KEEP factual accuracy
+    6. **Quantify Impact**: Ensure numbers and metrics are preserved from original
+    7. **Maintain Consistency**: Use same tense and format as original bullets
+    8. **Use Markdown Formatting**: Apply **bold** formatting to emphasize important keywords, technologies, and key achievements that match the target requirements
+    9. **Score Each Selected Bullet**: Assign a relevance score (0.0-1.0) to each description bullet you include
+    10. **Score Skill Categories**: Assign a relevance score to each skill category
+
+    ## Scoring Guidelines
+    For each selected bullet point and skill category:
+    - 1.0 = Perfectly aligned with requirements (direct match, quantifiable impact)
+    - 0.7-0.9 = Highly relevant (strong keyword matches, clear value)
+    - 0.4-0.6 = Moderately relevant (some connection to requirements)
+    - 0.1-0.3 = Minimally relevant (tangential or weak connection)
+    - 0.0 = Not relevant (should not be included)
 
     ## Output Requirements
-    - Return ALL scored items (the optimizer will trim to fit 1 page later)
-    - Exclude only completely irrelevant items (score < 0.1)
-    - Ensure scores are realistic and differentiated
-    - Provide concise reasoning (1-2 sentences max)
+    - Include ONLY the most relevant items (don't include everything)
+    - Reorder experiences/projects to put most relevant first
+    - Keep original bullet points but you may:
+      • Reorder bullets to put most relevant first
+      • Slightly rephrase for clarity (preserve facts!)
+      • Add emphasis to matching keywords
+    - For skills: Include all categories but order them by relevance
+    - Each selected bullet must have a relevance score
+    - Each skill category must have a relevance score
+    - Ensure output is valid JSON matching the ScoredResumeData schema
 
     {{ _.role('user') }}
     {{ ctx.output_format }}
@@ -225,7 +242,7 @@ function GenerateScoredResume(
     {{ request.job_description }}
     {% endif %}
 
-    Score all experiences, projects, and skill categories now based on relevance to the above requirements.
-    Return comprehensive scored data - the optimizer will handle trimming to fit 1 page.
+    Generate the scored resume now based on the above requirements.
+    Select only the most relevant items and score each selected bullet point and skill category.
   "#
 }

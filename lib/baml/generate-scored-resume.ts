@@ -4,8 +4,16 @@ import type {
   MasterExperienceData,
   UserResumeRequest,
 } from '@/baml_client/types';
-import { optimizeForOnePage, selectTopScoredItems, OptimizedResumeResult } from '@/lib/resume/optimizer';
+import { optimizeForOnePageIterative, selectTopScoredItems } from '@/lib/resume/optimizer';
+import { estimatePageCount } from '@/lib/docx/page-estimator';
 import { GenerateResumeOptions } from './generate-resume';
+
+// Legacy interface for compatibility
+export interface OptimizedResumeResult {
+  resumeData: any;
+  metrics: any;
+  removedItems: any[];
+}
 
 /**
  * Generate scored resume data using BAML AI
@@ -63,28 +71,46 @@ export async function generateOptimizedResume(
   // Get scored data from BAML
   const scoredData = await generateScoredResume(request, masterData);
 
-  // If fitToOnePage enabled, optimize with dynamic counting
+  // If fitToOnePage enabled, use iterative optimization with character-aware counting
   if (fitToOnePage) {
-    console.log('\n📏 1-Page optimization enabled - will remove lowest-scored items');
-    const result = await optimizeForOnePage(scoredData);
+    console.log('\n📏 1-Page optimization enabled - iterative bullet removal with character-aware counting');
+    const result = optimizeForOnePageIterative(scoredData);
+
+    // Get full metrics for the optimized resume
+    const metrics = estimatePageCount(result.resumeData);
 
     console.log(`\n${'='.repeat(60)}`);
     console.log('✅ Resume Generation Complete');
-    console.log(`   Final Pages: ${result.metrics.estimatedPages.toFixed(2)}`);
-    console.log(`   Items Removed: ${result.removedItems.length}`);
+    console.log(`   Final Pages: ${result.estimatedPages.toFixed(2)}`);
+    console.log(`   Iterations: ${result.iterations}`);
+    console.log(`   Bullets Removed: ${result.removedBullets.length}`);
     console.log(`${'='.repeat(60)}\n`);
 
-    return result;
+    return {
+      resumeData: result.resumeData,
+      metrics,
+      removedItems: result.removedBullets.map(b => ({
+        type: b.type,
+        item: { text: b.bulletText, title: b.itemTitle },
+        score: b.score,
+        reasoning: `Bullet from ${b.itemTitle}`
+      }))
+    };
   }
 
   // Otherwise, return top-scored items without trimming
   console.log('\n📄 Selecting top-scored items (no page limit)');
-  const result = selectTopScoredItems(scoredData);
+  const resumeData = selectTopScoredItems(scoredData);
+  const metrics = estimatePageCount(resumeData);
 
   console.log(`\n${'='.repeat(60)}`);
   console.log('✅ Resume Generation Complete');
-  console.log(`   Estimated Pages: ${result.metrics.estimatedPages.toFixed(2)}`);
+  console.log(`   Estimated Pages: ${metrics.estimatedPages.toFixed(2)}`);
   console.log(`${'='.repeat(60)}\n`);
 
-  return result;
+  return {
+    resumeData,
+    metrics,
+    removedItems: []
+  };
 }

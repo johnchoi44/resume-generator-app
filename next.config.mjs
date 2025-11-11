@@ -2,6 +2,8 @@
 const nextConfig = {
   experimental: {
     serverActions: {
+      // Note: This is for server actions, NOT API routes
+      // API route CORS is handled in middleware.ts
       allowedOrigins: ['localhost:3000']
     }
   },
