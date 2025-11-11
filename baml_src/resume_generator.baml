@@ -16,7 +16,7 @@ class Experience {
 
 class Project {
   name string @description("Project title")
-  position string @description("Optional role in project, e.g., 'Team Lead'. Can be empty string.")
+  position string? @description("Optional role in project, e.g., 'Team Lead'")
   date_from string @description("Project start date")
   date_to string @description("Project end date")
   description string[] @description("Array of bullet points describing the project")
@@ -45,7 +45,7 @@ class ScoredExperience {
 
 class ScoredProject {
   name string @description("Project title")
-  position string @description("Optional role in project")
+  position string? @description("Optional role in project")
   date_from string @description("Project start date")
   date_to string @description("Project end date")
   scored_descriptions ScoredDescription[] @description("Array of scored bullet points")
@@ -72,7 +72,7 @@ class MasterExperienceData {
 
 // User input
 class UserResumeRequest {
-  keywords string[] @description("Target skills or technologies, e.g., ['Machine Learning', 'Python', 'AWS']")
+  keywords string[]? @description("Optional target skills or technologies, e.g., ['Machine Learning', 'Python', 'AWS']")
   job_description string? @description("Optional job posting text to match against")
   target_role string? @description("Optional desired job title, e.g., 'Senior Data Scientist'")
 }

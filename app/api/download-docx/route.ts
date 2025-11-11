@@ -37,7 +37,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const filename = getResumeFilename(targetRole);
 
     // Return the DOCX file
-    return new NextResponse(docxBuffer, {
+    // Convert Buffer to Uint8Array for Next.js 16 compatibility
+    const uint8Array = new Uint8Array(docxBuffer);
+
+    return new NextResponse(uint8Array, {
       status: 200,
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

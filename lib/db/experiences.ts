@@ -86,7 +86,7 @@ export async function getExperiencesByKeywords(keywords: string[]): Promise<IExp
     ]
   }).sort({ displayOrder: 1 }).lean();
 
-  return experiences as IExperience[];
+  return experiences as unknown as IExperience[];
 }
 
 /**
@@ -105,7 +105,7 @@ export async function getProjectsByTechnologies(technologies: string[]): Promise
     ]
   }).sort({ displayOrder: 1 }).lean();
 
-  return projects as IProject[];
+  return projects as unknown as IProject[];
 }
 
 /**
@@ -116,7 +116,7 @@ export async function getAllExperiences(): Promise<IExperience[]> {
   const experiences = await Experience.find({ isActive: true })
     .sort({ displayOrder: 1 })
     .lean();
-  return experiences as IExperience[];
+  return experiences as unknown as IExperience[];
 }
 
 /**
@@ -125,7 +125,7 @@ export async function getAllExperiences(): Promise<IExperience[]> {
 export async function getAllSkills(): Promise<ISkill[]> {
   await connectDB();
   const skills = await Skill.find().sort({ displayOrder: 1 }).lean();
-  return skills as ISkill[];
+  return skills as unknown as ISkill[];
 }
 
 /**
@@ -136,5 +136,5 @@ export async function getAllProjects(): Promise<IProject[]> {
   const projects = await Project.find({ isActive: true })
     .sort({ displayOrder: 1 })
     .lean();
-  return projects as IProject[];
+  return projects as unknown as IProject[];
 }
