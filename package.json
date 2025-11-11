@@ -1,0 +1,41 @@
+{
+  "name": "resume-generator-app",
+  "version": "0.1.0",
+  "description": "AI-powered resume generator with BAML and MongoDB",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "baml:generate": "node scripts/regenerate-baml.js",
+    "migrate": "node scripts/migrate-to-mongodb.js",
+    "seed": "npx tsx scripts/seed-database.ts"
+  },
+  "dependencies": {
+    "@boundaryml/baml": "^0.213.0",
+    "@react-pdf/renderer": "^4.3.1",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "angular-expressions": "^1.5.1",
+    "autoprefixer": "^10.4.21",
+    "docxtemplater": "^3.67.3",
+    "mongoose": "^8.19.3",
+    "next": "^16.0.1",
+    "pizzip": "^3.2.0",
+    "postcss": "^8.5.6",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.17",
+    "@types/pizzip": "^3.1.2",
+    "dotenv": "^17.2.3",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "^16.0.1",
+    "tsx": "^4.20.6"
+  }
+}
