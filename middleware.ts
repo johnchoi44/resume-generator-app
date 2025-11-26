@@ -19,6 +19,7 @@ export function middleware(request: NextRequest) {
       'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:5173', // Vite default port
+      'http://localhost:5174', // Portfolio dev server
     ];
 
     const allAllowedOrigins = [...defaultAllowedOrigins, ...allowedOrigins];

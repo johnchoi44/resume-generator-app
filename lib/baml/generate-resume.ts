@@ -1,4 +1,5 @@
 import { b } from '@/baml_client';
+import { Collector } from '@boundaryml/baml';
 import type {
   ResumeData,
   MasterExperienceData,
@@ -11,6 +12,21 @@ export interface GenerateResumeOptions {
   targetRole?: string;
 }
 
+export interface DebugInfo {
+  prompt?: any;
+  rawResponse?: string | null;
+  response?: any;
+  usage?: {
+    inputTokens?: number | null;
+    outputTokens?: number | null;
+  } | null;
+}
+
+export interface GenerateResumeResult {
+  resumeData: ResumeData;
+  debug?: DebugInfo;
+}
+
 /**
  * Generate a customized resume using BAML AI
  * Falls back to keyword-based filtering if BAML fails
@@ -18,7 +34,7 @@ export interface GenerateResumeOptions {
 export async function generateCustomizedResume(
   request: GenerateResumeOptions,
   masterData: MasterExperienceData
-): Promise<ResumeData> {
+): Promise<GenerateResumeResult> {
   try {
     // Convert to BAML request format
     const bamlRequest: UserResumeRequest = {
@@ -29,20 +45,35 @@ export async function generateCustomizedResume(
 
     console.log('🤖 Calling BAML to generate resume...');
 
-    // Call BAML function
-    const resumeData = await b.GenerateCustomizedResume(bamlRequest, masterData);
+    // Create collector to capture raw HTTP request/response
+    const collector = new Collector("resume-generator");
+
+    // Call BAML function with collector
+    const resumeData = await b.GenerateCustomizedResume(bamlRequest, masterData, { collector });
 
     console.log('✓ BAML generation successful');
 
+    // Extract debug info from collector
+    const lastCall = collector.last?.calls?.slice(-1)[0];
+    const debug: DebugInfo = {
+      prompt: lastCall?.httpRequest?.body?.json(),
+      rawResponse: collector.last?.rawLlmResponse,
+      response: lastCall?.httpResponse?.body?.json(),
+      usage: collector.last?.usage ? {
+        inputTokens: collector.last.usage.inputTokens,
+        outputTokens: collector.last.usage.outputTokens,
+      } : null,
+    };
+
     // BAML automatically validates against the ResumeData schema
     // If validation fails, it throws a type error
-    return resumeData;
+    return { resumeData, debug };
 
   } catch (error) {
     console.error('BAML generation failed, using fallback:', error);
 
     // Fallback: Return filtered master data based on keywords
-    return fallbackResumeGeneration(request, masterData);
+    return { resumeData: fallbackResumeGeneration(request, masterData) };
   }
 }
 

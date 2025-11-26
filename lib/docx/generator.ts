@@ -32,12 +32,15 @@ export interface ResumeData {
  * Keeps markdown formatting in descriptions intact for MarkdownModule processing
  */
 function processDataForTemplate(data: ResumeData): any {
+  // Helper to strip markdown bold markers from skills
+  const stripBold = (text: string) => text.replace(/\*\*/g, '');
+
   // Process skills to convert items array to pipe-separated string
   const processedSkills = data.skills?.map(skill => ({
     ...skill,
     items: Array.isArray(skill.items)
-      ? skill.items.join(' | ')  // Convert array to " | " separated string
-      : skill.items
+      ? skill.items.map(item => stripBold(item)).join(' | ')  // Strip ** and convert to " | " separated string
+      : stripBold(skill.items)
   })) || [];
 
   return {

@@ -47,14 +47,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateR
     const body: GenerateResumeRequest = await request.json();
     const { keywords, jobDescription, targetRole, format = 'pdf', fitToOnePage = false } = body;
 
-    // Validate input
-    if (!keywords?.length && !jobDescription && !targetRole) {
+    // Validate that at least keywords or target role is provided
+    if (!keywords?.length && !targetRole) {
       return NextResponse.json(
         {
           success: false,
           error: {
             code: 'INVALID_REQUEST',
-            message: 'Please provide at least one of: keywords, job description, or target role',
+            message: 'Keywords or target role is required',
           },
         },
         { status: 400 }
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateR
       });
     } else {
       // Use traditional generation method
-      const resumeData = await generateCustomizedResume(
+      const result = await generateCustomizedResume(
         {
           keywords,
           jobDescription,
@@ -136,17 +136,18 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateR
 
       console.log('✅ Resume generated successfully:', {
         generationTime: `${generationTime}ms`,
-        selectedExperiences: resumeData.experiences.length,
-        selectedProjects: resumeData.projects.length,
-        selectedSkills: resumeData.skills.length,
+        selectedExperiences: result.resumeData.experiences.length,
+        selectedProjects: result.resumeData.projects.length,
+        selectedSkills: result.resumeData.skills.length,
       });
 
-      // Return response
+      // Return response with debug info
       return NextResponse.json({
         success: true,
         data: {
-          resumeData,
+          resumeData: result.resumeData,
           generationTime,
+          debug: result.debug,
         },
       });
     }

@@ -99,6 +99,25 @@ function GenerateCustomizedResume(
     7. **Maintain Consistency**: Use same tense and format as original bullets
     8. **Use Markdown Formatting**: Apply **bold** formatting to emphasize important keywords, technologies, and key achievements that match the target requirements
 
+    ## Keyword Classification & Filtering
+    First, analyze the provided keywords and classify each as:
+    - **Technical/Professional**: Programming languages, frameworks, tools, methodologies, soft skills, industry terms
+    - **Non-Technical/Lifestyle**: Hobbies, interests, entertainment (sports, music, movies, gaming, travel, arts, etc.)
+
+    **Filtering Rules:**
+    1. If ALL keywords are technical/professional:
+       - Use standard selection logic (2-4 experiences, 2-3 projects based on relevance)
+
+    2. If ANY keyword is non-technical/lifestyle:
+       - Apply STRICT FILTERING mode
+       - ONLY include experiences, projects, and skills that have a DIRECT connection to ANY of the provided keywords
+       - For non-technical keywords: match company, industry, role, or work directly related to that topic
+         - Example: "sports" → sports companies, athletic organizations, sports media, fitness tech
+         - Example: "music" → music labels, audio companies, entertainment venues, streaming services
+       - For technical keywords in mixed lists: still match as usual
+       - Include items that match EITHER technical OR non-technical keywords (OR logic)
+       - If no items match any keyword, return empty arrays rather than unrelated content
+
     ## Output Requirements
     - Include ONLY the most relevant items (don't include everything)
     - Reorder experiences/projects to put most relevant first
@@ -179,6 +198,25 @@ function GenerateScoredResume(
     8. **Use Markdown Formatting**: Apply **bold** formatting to emphasize important keywords, technologies, and key achievements that match the target requirements
     9. **Score Each Selected Bullet**: Assign a relevance score (0.0-1.0) to each description bullet you include
     10. **Score Skill Categories**: Assign a relevance score to each skill category
+
+    ## Keyword Classification & Filtering
+    First, analyze the provided keywords and classify each as:
+    - **Technical/Professional**: Programming languages, frameworks, tools, methodologies, soft skills, industry terms
+    - **Non-Technical/Lifestyle**: Hobbies, interests, entertainment (sports, music, movies, gaming, travel, arts, etc.)
+
+    **Filtering Rules:**
+    1. If ALL keywords are technical/professional:
+       - Use standard selection logic (2-4 experiences, 2-3 projects based on relevance)
+
+    2. If ANY keyword is non-technical/lifestyle:
+       - Apply STRICT FILTERING mode
+       - ONLY include experiences, projects, and skills that have a DIRECT connection to ANY of the provided keywords
+       - For non-technical keywords: match company, industry, role, or work directly related to that topic
+         - Example: "sports" → sports companies, athletic organizations, sports media, fitness tech
+         - Example: "music" → music labels, audio companies, entertainment venues, streaming services
+       - For technical keywords in mixed lists: still match as usual
+       - Include items that match EITHER technical OR non-technical keywords (OR logic)
+       - If no items match any keyword, return empty arrays rather than unrelated content
 
     ## Scoring Guidelines
     For each selected bullet point and skill category:
