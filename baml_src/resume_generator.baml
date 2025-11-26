@@ -106,17 +106,13 @@ function GenerateCustomizedResume(
 
     **Filtering Rules:**
     1. If ALL keywords are technical/professional:
-       - Use standard selection logic (2-4 experiences, 2-3 projects based on relevance)
+       - Use standard selection logic
 
     2. If ANY keyword is non-technical/lifestyle:
-       - Apply STRICT FILTERING mode
-       - ONLY include experiences, projects, and skills that have a DIRECT connection to ANY of the provided keywords
+       - ONLY include experiences, projects, and skills that have a connection to ANY of the provided keywords
        - For non-technical keywords: match company, industry, role, or work directly related to that topic
-         - Example: "sports" → sports companies, athletic organizations, sports media, fitness tech
-         - Example: "music" → music labels, audio companies, entertainment venues, streaming services
-       - For technical keywords in mixed lists: still match as usual
-       - Include items that match EITHER technical OR non-technical keywords (OR logic)
-       - If no items match any keyword, return empty arrays rather than unrelated content
+       - For technical keywords in mixed lists: include items that match EITHER technical OR non-technical keywords
+       - If no items match any keyword, return somewhat related content
 
     ## Output Requirements
     - Include ONLY the most relevant items (don't include everything)
@@ -125,7 +121,7 @@ function GenerateCustomizedResume(
       • Reorder bullets to put most relevant first
       • Slightly rephrase for clarity (preserve facts!)
       • Add emphasis to matching keywords
-    - For skills: Include all categories but order them by relevance
+    - For skills: ONLY include skill categories that are relevant to the keywords/target role.
     - Ensure output is valid JSON matching the ResumeData schema
 
     {{ _.role('user') }}
@@ -206,17 +202,13 @@ function GenerateScoredResume(
 
     **Filtering Rules:**
     1. If ALL keywords are technical/professional:
-       - Use standard selection logic (2-4 experiences, 2-3 projects based on relevance)
+       - Use standard selection logic
 
     2. If ANY keyword is non-technical/lifestyle:
-       - Apply STRICT FILTERING mode
-       - ONLY include experiences, projects, and skills that have a DIRECT connection to ANY of the provided keywords
+       - ONLY include experiences, projects, and skills that have a connection to ANY of the provided keywords
        - For non-technical keywords: match company, industry, role, or work directly related to that topic
-         - Example: "sports" → sports companies, athletic organizations, sports media, fitness tech
-         - Example: "music" → music labels, audio companies, entertainment venues, streaming services
-       - For technical keywords in mixed lists: still match as usual
-       - Include items that match EITHER technical OR non-technical keywords (OR logic)
-       - If no items match any keyword, return empty arrays rather than unrelated content
+       - For technical keywords in mixed lists: include items that match EITHER technical OR non-technical keywords
+       - If no items match any keyword, return somewhat related content
 
     ## Scoring Guidelines
     For each selected bullet point and skill category:
@@ -233,7 +225,7 @@ function GenerateScoredResume(
       • Reorder bullets to put most relevant first
       • Slightly rephrase for clarity (preserve facts!)
       • Add emphasis to matching keywords
-    - For skills: Include all categories but order them by relevance
+    - For skills: ONLY include skill categories that are relevant to the keywords/target role.
     - Each selected bullet must have a relevance score
     - Each skill category must have a relevance score
     - Ensure output is valid JSON matching the ScoredResumeData schema
