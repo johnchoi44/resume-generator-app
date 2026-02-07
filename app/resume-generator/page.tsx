@@ -30,6 +30,7 @@ export default function ResumeGeneratorPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-API-Key': process.env.NEXT_PUBLIC_RESUME_API_KEY || '',
         },
         body: JSON.stringify({
           keywords: input.keywords,
